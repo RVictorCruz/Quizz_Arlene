@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizz: Sistema Imunológico e Th1</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .intro {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .animation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            background: #e74c3c;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .cell {
+            width: 50px;
+            height: 50px;
+            background: #f39c12;
+            border-radius: 50%;
+            animation: move 3s ease-in-out infinite;
+        }
+        @keyframes move {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(100px); }
+            100% { transform: translateX(0); }
+        }
+        .quiz {
+            display: none;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 8px;
+            border-left: 5px solid #3498db;
+        }
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+        .options li {
+            margin: 10px 0;
+        }
+        .options input {
+            margin-right: 10px;
+        }
+        button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #2ecc71;
+        }
+        .result {
+            display: none;
+            text-align: center;
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+        .correct {
+            color: #27ae60;
+        }
+        .incorrect {
+            color: #e74c3c;
+        }
+        .ranking {
+            display: none;
+            margin-top: 20px;
+        }
+        .ranking ul {
+            list-style: none;
+            padding: 0;
+        }
+        .ranking li {
+            background: #ecf0f1;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quizz: Sistema Imunológico e Th1</h1>
+        <div class="intro">
+            <p>Bem-vindo ao quizz sobre o Sistema Imunológico e Subpopulação Th1! Teste seus conhecimentos sobre imunidade inata, adaptativa, linfócitos T e muito mais.</p>
+            <p>Prepare-se para uma jornada imersiva no mundo da imunologia!</p>
+        </div>
+        <div class="animation">
+            <div class="cell"></div>
+            <p style="margin-left: 20px; color: white; font-weight: bold;">Ativação Imunológica em ação!</p>
+        </div>
+        
+        <button id="startQuiz">Iniciar Quizz</button>
+        
+        <div class="quiz" id="quiz">
+            <h2>Perguntas (15 sorteadas)</h2>
+            <div id="questions"></div>
+            <button id="submitQuiz">Enviar Respostas</button>
+        </div>
+        
+        <div class="result" id="result">
+            <h2>Resultado</h2>
+            <p id="score"></p>
+            <p id="feedback"></p>
+            <button id="showRanking">Ver Ranking</button>
+        </div>
+        
+        <div class="ranking" id="ranking">
+            <h2>Ranking</h2>
+            <ul id="rankingList"></ul>
+        </div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('startQuiz');
+        const quiz = document.getElementById('quiz');
+        const submitBtn = document.getElementById('submitQuiz');
+        const result = document.getElementById('result');
+        const rankingEl = document.getElementById('ranking'); // Renomeado para evitar conflito
+        const showRankingBtn = document.getElementById('showRanking');
+        const questionsDiv = document.getElementById('questions');
+        const scoreEl = document.getElementById('score');
+        const feedbackEl = document.getElementById('feedback');
+        const rankingList = document.getElementById('rankingList');
+
+        let selectedQuestions = [];
+        const NUM_QUESTIONS = 15;
+
+        // Função de utilidade para embaralhar um array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Array com todas as perguntas
+        const allQuestions = [
+            // Perguntas sobre Sistema Imunológico Geral (expandido)
+            { id: 1, question: "O que é o sistema imunológico?", options: ["Um sistema de defesa contra invasores como vírus e bactérias.", "Um órgão responsável pela digestão.", "Um tipo de célula sanguínea.", "Uma barreira física apenas."], answer: "a" },
+            { id: 2, question: "Quais são as duas etapas principais do sistema imunológico?", options: ["Imunidade inata e adaptativa.", "Imunidade humoral e celular.", "Imunidade ativa e passiva.", "Imunidade natural e adquirida."], answer: "a" },
+            { id: 3, question: "O que inclui a imunidade inata?", options: ["Barreiras físicas como pele e mucosas, e células de ataque rápido.", "Linfócitos que aprendem a reconhecer patógenos.", "Produção de anticorpos específicos.", "Memória imunológica."], answer: "a" },
+            { id: 4, question: "O que é a imunidade adaptativa?", options: ["Resposta que aprende e memoriza patógenos específicos.", "Defesa imediata contra invasores.", "Produção de mucosas.", "Ataque rápido sem memória."], answer: "a" },
+            { id: 5, question: "Por que os linfócitos T são importantes?", options: ["São protagonistas da imunidade adaptativa e explicam infecções, vacinas e autoimunidade.", "Produzem anticorpos diretamente.", "Atuam apenas na pele.", "São responsáveis pela digestão."], answer: "a" },
+            { id: 6, question: "O que é a imunidade celular?", options: ["Defesa contra ameaças intracelulares, mediada por linfócitos T.", "Produção de anticorpos no sangue.", "Barreiras físicas do corpo.", "Resposta contra parasitas externos."], answer: "a" },
+            { id: 7, question: "Qual a diferença entre imunidade humoral e celular?", options: ["Humoral usa anticorpos contra patógenos extracelulares; celular ataca intracelulares.", "Humoral é inata; celular é adaptativa.", "Humoral usa células NK; celular usa macrófagos.", "Humoral é rápida; celular é lenta."], answer: "a" },
+            { id: 8, question: "Onde os linfócitos T nascem?", options: ["Na medula óssea.", "No timo.", "No fígado.", "No baço."], answer: "a" },
+            { id: 9, question: "O que é o timo?", options: ["Órgão onde os linfócitos T amadurecem.", "Local de produção de anticorpos.", "Barreira física da pele.", "Célula apresentadora de antígenos."], answer: "a" },
+            { id: 10, question: "O que é seleção positiva no timo?", options: ["Células que reconhecem MHC próprio sobrevivem.", "Células que atacam o próprio corpo são eliminadas.", "Células aprendem a produzir anticorpos.", "Células migram para a medula."], answer: "a" },
+            { id: 11, question: "O que é seleção negativa no timo?", options: ["Células que reconhecem demais o próprio corpo são eliminadas.", "Células que reconhecem MHC sobrevivem.", "Células produzem citocinas.", "Células se tornam linfócitos B."], answer: "a" },
+            { id: 12, question: "O que são linfócitos T?", options: ["Soldados da imunidade celular.", "Produtores de anticorpos.", "Barreiras físicas.", "Células de ataque rápido."], answer: "a" },
+            { id: 13, question: "Como os linfócitos TCD4 são ativados?", options: ["Reconhecendo antígeno no MHC Classe II via TCR.", "Produzindo anticorpos.", "Atacando diretamente células infectadas.", "Liberando mucosas."], answer: "a" },
+            { id: 14, question: "O que é MHC Classe II?", options: ["Bandeja usada por células apresentadoras para exibir antígenos.", "Receptor de célula T.", "Citocina inflamatória.", "Barreira física."], answer: "a" },
+            { id: 15, question: "O que são células apresentadoras de antígeno?", options: ["Macrófagos e células dendríticas.", "Linfócitos T.", "Células NK.", "Eosinófilos."], answer: "a" },
+            { id: 16, question: "O que é o TCR?", options: ["Receptor de célula T.", "Citocina.", "Barreira física.", "Antígeno."], answer: "a" },
+            { id: 17, question: "Qual é o papel dos macrófagos na imunidade?", options: ["Engolir patógenos e apresentar antígenos.", "Produzir anticorpos.", "Atacar células tumorais.", "Liberar mucosas."], answer: "a" },
+            { id: 18, question: "O que são células NK?", options: ["Células de ataque rápido contra células infectadas.", "Produtores de anticorpos.", "Barreiras físicas.", "Linfócitos T."], answer: "a" },
+            { id: 19, question: "O que é memória imunológica?", options: ["Capacidade de responder mais rápido a patógenos já encontrados.", "Defesa imediata.", "Produção de mucosas.", "Ataque sem reconhecimento."], answer: "a" },
+            { id: 20, question: "Qual é a diferença entre imunidade ativa e passiva?", options: ["Ativa é produzida pelo corpo; passiva é transferida.", "Ativa é inata; passiva é adaptativa.", "Ativa usa anticorpos; passiva usa células.", "Ativa é rápida; passiva é lenta."], answer: "a" },
+            // Perguntas sobre Th1 (do conteúdo original e expandido)
+            { id: 21, question: "O que são os linfócitos T CD4⁺ do tipo Th1?", options: ["Subpopulação especializada em promover respostas celulares contra patógenos intracelulares.", "Células que produzem anticorpos.", "Barreiras físicas.", "Células NK."], answer: "a" },
+            { id: 22, question: "Qual citocina inicia a diferenciação para Th1?", options: ["IL-12.", "IFN-γ.", "IL-2.", "TNF-β."], answer: "a" },
+            { id: 23, question: "Qual é a principal citocina Th1?", options: ["IFN-γ.", "IL-4.", "IL-10.", "TGF-β."], answer: "a" },
+            { id: 24, question: "O que o IFN-γ faz?", options: ["Ativa macrófagos para destruir microrganismos.", "Inibe macrófagos.", "Produz anticorpos.", "Reduz inflamação."], answer: "a" },
+            { id: 25, question: "Qual doença depende fortemente da resposta Th1?", options: ["Tuberculose.", "Asma.", "Dermatite atópica.", "Rinite alérgica."], answer: "a" },
+            { id: 26, question: "O que auxilia na proliferação de linfócitos T?", options: ["IL-2.", "IL-12.", "TNF-β.", "IL-13."], answer: "a" },
+            { id: 27, question: "O que o TNF-β auxilia?", options: ["Processos inflamatórios e destruição de tecidos infectados.", "Proliferação de T.", "Inibição de macrófagos.", "Produção de anticorpos."], answer: "a" },
+            { id: 28, question: "Qual é o patógeno alvo da Th1?", options: ["Intracelulares.", "Extracelulares.", "Parasitas intestinais.", "Fungos."], answer: "a" },
+            { id: 29, question: "O que acontece com excesso de Th1?", options: ["Doenças autoimunes.", "Alergias.", "Infecções virais persistentes.", "Redução da inflamação."], answer: "a" },
+            { id: 30, question: "Qual doença autoimune está associada à hiperatividade Th1?", options: ["Diabetes Mellitus Tipo 1.", "Asma.", "Dermatite atópica.", "Rinite alérgica."], answer: "a" },
+            { id: 31, question: "O que regula o equilíbrio Th1/Th2?", options: ["Tregs com IL-10 e TGF-β.", "Apenas IFN-γ.", "Citocinas ambientais.", "Macrófagos."], answer: "a" },
+            { id: 32, question: "O que o IFN-γ inibe?", options: ["Desenvolvimento de Th2.", "Macrófagos.", "Inflamação.", "TCD8."], answer: "a" },
+            { id: 33, question: "Em qual infecção a Th1 ativa macrófagos para destruir amastigotas?", options: ["Leishmaniose.", "Tuberculose.", "Hepatite.", "HIV."], answer: "a" },
+            { id: 34, question: "O que é essencial na resposta Th1 contra vírus?", options: ["Estimular TCD8.", "Produzir anticorpos.", "Atacar extracelulares.", "Reduzir MHC."], answer: "a" },
+            { id: 35, question: "Qual citocina reforça o perfil celular?", options: ["IFN-γ.", "IL-4.", "IL-5.", "IL-13."], answer: "a" },
+            { id: 36, question: "O que o T-bet faz?", options: ["Orienta a célula T para o fenótipo Th1.", "Produz anticorpos.", "Inibe inflamação.", "Ativa Th2."], answer: "a" },
+            { id: 37, question: "Qual é a função da resposta Th1 na tuberculose?", options: ["Ativar macrófagos e formar granulomas.", "Produzir IgE.", "Reduzir inflamação.", "Atacar parasitas."], answer: "a" },
+            { id: 38, question: "O que auxilia na expansão clonal?", options: ["IL-2.", "TNF-β.", "IL-12.", "IFN-γ."], answer: "a" },
+            { id: 39, question: "Qual é o risco do excesso Th1?", options: ["Autoimunidade.", "Infecções graves.", "Alergias.", "Câncer."], answer: "a" },
+            { id: 40, question: "O que o equilíbrio Th1/Th2 evita?", options: ["Infecções e alergias.", "Apenas infecções.", "Apenas alergias.", "Inflamação."], answer: "a" },
+            { id: 41, question: "Qual célula produz IL-12 em resposta a patógenos?", options: ["Macrófagos e dendríticas.", "Linfócitos B.", "Células NK.", "Eosinófilos."], answer: "a" },
+            { id: 42, question: "O que estimula células NK?", options: ["IL-2.", "IL-12.", "TNF-β.", "IFN-γ."], answer: "a" },
+            { id: 43, question: "Qual é a resposta Th1 contra protozoários?", options: ["Leishmania spp.", "Vírus.", "Bactérias extracelulares.", "Fungos."], answer: "a" },
+            { id: 44, question: "O que aumenta MHC I e II?", options: ["IFN-γ.", "IL-2.", "TNF-β.", "IL-12."], answer: "a" },
+            { id: 45, question: "Qual doença tem resposta Th2 predominante grave?", options: ["Leishmaniose visceral.", "Tuberculose.", "DM1.", "EM."], answer: "a" },
+            { id: 46, question: "O que é essencial na fase inicial do HIV?", options: ["Resposta Th1.", "Alergias.", "Autoimunidade.", "Parasitas."], answer: "a" },
+            { id: 47, question: "Qual citocina auxilia em processos inflamatórios?", options: ["TNF-β.", "IL-2.", "IL-12.", "IFN-γ."], answer: "a" },
+            { id: 48, question: "O que o recrutamento de células de defesa envolve?", options: ["TNF-β.", "IL-2.", "IL-12.", "IFN-γ."], answer: "a" },
+            { id: 49, question: "Qual é o papel na imunidade celular mediada por TCD8?", options: ["IL-2 auxilia na expansão.", "IFN-γ inibe.", "TNF-β destrói.", "IL-12 inicia."], answer: "a" },
+            { id: 50, question: "O que é importante contra Listeria monocytogenes?", options: ["Th1.", "Th2.", "Humoral.", "Inata."], answer: "a" },
+            { id: 51, question: "Qual doença autoimune por Th1?", options: ["Esclerose Múltipla.", "Asma.", "Hepatite.", "Leishmaniose."], answer: "a" },
+            // Pergunta incompleta corrigida
+            { id: 52, question: "O que regula o crescimento e diferenciação das células T?", options: ["IL-2 (Interleucina 2).", "IL-4 (Interleucina 4).", "TNF-α (Fator de Necrose Tumoral Alfa).", "Histamina."], answer: "a" },
+        ];
+
+
+        // 1. Iniciar o Quizz
+        function startQuiz() {
+            // Embaralha todas as perguntas
+            shuffleArray(allQuestions);
+            // Seleciona as 15 primeiras
+            selectedQuestions = allQuestions.slice(0, NUM_QUESTIONS);
+            // Carrega as perguntas no HTML
+            loadQuestions();
+            
+            // Esconde introdução e ranking, mostra o quizz
+            document.querySelector('.intro').style.display = 'none';
+            document.querySelector('.animation').style.display = 'none';
+            startBtn.style.display = 'none';
+            result.style.display = 'none';
+            rankingEl.style.display = 'none';
+            quiz.style.display = 'block';
+        }
+
+        // 2. Carregar as perguntas na interface
+        function loadQuestions() {
+            questionsDiv.innerHTML = ''; // Limpa perguntas anteriores
+            selectedQuestions.forEach((q, index) => {
+                const questionEl = document.createElement('div');
+                questionEl.classList.add('question');
+                questionEl.innerHTML = `
+                    <p><strong>${index + 1}. ${q.question}</strong></p>
+                    <ul class="options">
+                        <li>
+                            <input type="radio" id="q${q.id}a" name="question${q.id}" value="a">
+                            <label for="q${q.id}a">${q.options[0]}</label>
+                        </li>
+                        <li>
+                            <input type="radio" id="q${q.id}b" name="question${q.id}" value="b">
+                            <label for="q${q.id}b">${q.options[1]}</label>
+                        </li>
+                        <li>
+                            <input type="radio" id="q${q.id}c" name="question${q.id}" value="c">
+                            <label for="q${q.id}c">${q.options[2]}</label>
+                        </li>
+                        <li>
+                            <input type="radio" id="q${q.id}d" name="question${q.id}" value="d">
+                            <label for="q${q.id}d">${q.options[3]}</label>
+                        </li>
+                    </ul>
+                `;
+                questionsDiv.appendChild(questionEl);
+            });
+        }
+
+        // 3. Submeter o Quizz e mostrar os resultados
+        function submitQuizResults() {
+            let score = 0;
+            const totalQuestions = selectedQuestions.length;
+            
+            selectedQuestions.forEach(q => {
+                // Pega o valor selecionado para a pergunta
+                const selectedOption = document.querySelector(`input[name="question${q.id}"]:checked`);
+                
+                if (selectedOption && selectedOption.value === q.answer) {
+                    score++;
+                }
+            });
+
+            const percentage = (score / totalQuestions) * 100;
+
+            scoreEl.innerHTML = `Você acertou **${score}** de ${totalQuestions} perguntas! (${percentage.toFixed(2)}%)`;
+
+            if (percentage >= 90) {
+                feedbackEl.innerHTML = `<span class="correct">Excelente! Você é um expert em Imunologia! 🧬</span>`;
+            } else if (percentage >= 70) {
+                feedbackEl.innerHTML = `<span class="correct">Muito Bom! Ótimo conhecimento sobre Th1 e Imunidade. 💪</span>`;
+            } else if (percentage >= 50) {
+                feedbackEl.innerHTML = `<span class="incorrect">Bom! Mas ainda há o que aprender sobre as células Th1. 📚</span>`;
+            } else {
+                feedbackEl.innerHTML = `<span class="incorrect">Precisa estudar mais! A Imunologia é fascinante. Recomendo revisar os temas. 🔬</span>`;
+            }
+
+            // Armazena o resultado para o ranking (Simulado)
+            saveScore(score, totalQuestions);
+
+            // Esconde quizz, mostra resultados
+            quiz.style.display = 'none';
+            result.style.display = 'block';
+        }
+
+        // 4. Funções de Ranking (usando localStorage para simular)
+        function saveScore(score, total) {
+            const currentRanking = JSON.parse(localStorage.getItem('quizzRanking')) || [];
+            
+            // Pede um nome simples (simulando um usuário)
+            const userName = prompt("Parabéns! Digite seu nome para o Ranking:") || "Anônimo";
+            
+            const newScore = {
+                name: userName,
+                score: score,
+                total: total,
+                date: new Date().toLocaleString('pt-BR')
+            };
+
+            currentRanking.push(newScore);
+            // Ordena do maior para o menor
+            currentRanking.sort((a, b) => b.score - a.score); 
+            // Limita o ranking aos 10 melhores
+            if (currentRanking.length > 10) {
+                currentRanking.splice(10);
+            }
+
+            localStorage.setItem('quizzRanking', JSON.stringify(currentRanking));
+        }
+
+        function showRanking() {
+            const currentRanking = JSON.parse(localStorage.getItem('quizzRanking')) || [];
+            
+            rankingList.innerHTML = ''; // Limpa a lista
+            
+            if (currentRanking.length === 0) {
+                rankingList.innerHTML = '<li>Nenhum resultado registrado ainda.</li>';
+            } else {
+                currentRanking.forEach((item, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <strong>#${index + 1} ${item.name}</strong> 
+                        <span>${item.score}/${item.total}</span>
+                    `;
+                    rankingList.appendChild(listItem);
+                });
+            }
+
+            // Esconde resultados, mostra ranking
+            result.style.display = 'none';
+            rankingEl.style.display = 'block';
+        }
+
+        // Event Listeners
+        startBtn.addEventListener('click', startQuiz);
+        submitBtn.addEventListener('click', submitQuizResults);
+        showRankingBtn.addEventListener('click', showRanking);
+        
+    </script>
+</body>
+</html>
