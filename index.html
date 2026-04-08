@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmacoGame Studio | Treinamento em Farmacologia</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="animated-bg"></div>
+    
+    <div class="main-container">
+        <header class="menu-header">
+            <div class="badge">FarmacoGame Studio</div>
+            <h1>Laboratório de <span class="gradient-text">Farmacologia</span></h1>
+            <p class="subtitle">Escolha um módulo de treinamento para iniciar sua jornada</p>
+        </header>
+
+        <div class="selection-screen">
+            <div class="game-card" data-game="quiz">
+                <div class="card-glow"></div>
+                <div class="icon-wrapper">
+                    <div class="icon">💊</div>
+                </div>
+                <h2>Quem Sou Eu?</h2>
+                <p>Um quiz de tempo real para testar seus conhecimentos sobre <strong>vias de administração</strong> e <strong>fármacos específicos</strong>.</p>
+                <ul class="features">
+                    <li>🎯 3 Dicas progressivas</li>
+                    <li>⚡ Bônus de rapidez</li>
+                    <li>📊 Foco em Farmacocinética</li>
+                </ul>
+                <button onclick="irParaJogo('quiz')" class="btn-play">
+                    <span>Jogar Agora</span>
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none">
+                        <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="game-card highlight" data-game="sna">
+                <div class="card-glow"></div>
+                <div class="icon-wrapper">
+                    <div class="icon">🧠</div>
+                </div>
+                <div class="new-badge">RECOMENDADO</div>
+                <h2>Desafio do SNA</h2>
+                <p>Treine seus reflexos sobre o <strong>Sistema Nervoso Autônomo</strong>. Simpático ou Parassimpático?</p>
+                <ul class="features">
+                    <li>🎨 Visualização de órgãos</li>
+                    <li>⚔️ Dualidade Luta ou Fuga</li>
+                    <li>🔄 Interação Simpático/Parassimpático</li>
+                </ul>
+                <button onclick="irParaJogo('sna')" class="btn-play">
+                    <span>Jogar Agora</span>
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none">
+                        <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <footer class="main-footer">
+            <p>🎓 Baseado nas aulas da <strong>Profa. Larissa Marques</strong></p>
+            <div class="footer-stats">
+                <span>📚 2 Módulos disponíveis</span>
+                <span>⭐ 98% de aprovação</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function irParaJogo(tipo) {
+            const buttons = document.querySelectorAll('.btn-play');
+            buttons.forEach(btn => btn.style.opacity = '0.7');
+            
+            setTimeout(() => {
+                if(tipo === 'quiz') {
+                    window.location.href = 'JogoQuemSouEu/index.html';
+                } else {
+                    window.location.href = 'DesafiodoSNASimpaticovsParassimpatico/index.html';
+                }
+            }, 200);
+        }
+
+        // Adiciona animação de hover nos cards
+        document.querySelectorAll('.game-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body>
+</html>

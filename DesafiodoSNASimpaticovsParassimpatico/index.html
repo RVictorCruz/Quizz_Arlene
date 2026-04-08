@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ SNA Reflex Challenge | Simpático vs Parassimpático</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-wrapper">
+        <div class="bg-gradient"></div>
+        
+        <div class="game-container">
+            <!-- Header com status do sistema e pause -->
+            <div class="game-header">
+                <div class="system-status" id="system-status">
+                    <div class="status-indicator"></div>
+                    <span>Sistema Ativo:</span>
+                    <strong id="modo-sistema">---</strong>
+                </div>
+                
+                <button class="btn-pause" id="btnPause" onclick="togglePause()">
+                    <span class="pause-icon">⏸️</span>
+                    <span class="pause-text">Pause</span>
+                </button>
+            </div>
+
+            <!-- Card do órgão (widescreen) -->
+            <div class="organ-card">
+                <div class="situacao-badge" id="situacao-badge">
+                    <span class="badge-icon">⚡</span>
+                    <span id="situacao-texto">---</span>
+                </div>
+                
+                <div id="view-port">
+                    <div class="organ-image-container">
+                        <div class="image-frame">
+                            <img id="organo-imagem" src="" alt="Órgão" class="organ-image">
+                            <div class="image-overlay"></div>
+                            <div class="organ-glow" id="organ-glow"></div>
+                        </div>
+                        <div class="organ-label">
+                            <h2 id="nome-orgao" class="organ-name">ÓRGÃO</h2>
+                            <div class="organ-system-badge" id="organ-system-badge"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Efeito de feedback visual -->
+                <div class="feedback-effect" id="feedback-effect"></div>
+            </div>
+
+            <!-- Botões de ação -->
+            <div class="controles">
+                <button class="btn-acao btn-acao-a" id="btnA" onclick="jogar('A')">
+                    <span class="btn-label">Ação A</span>
+                    <span class="btn-hint">Clique rápido!</span>
+                </button>
+                <button class="btn-acao btn-acao-b" id="btnB" onclick="jogar('B')">
+                    <span class="btn-label">Ação B</span>
+                    <span class="btn-hint">Clique rápido!</span>
+                </button>
+            </div>
+
+            <!-- Stats com design moderno -->
+            <div class="stats-panel">
+                <div class="stat-item">
+                    <span class="stat-icon">🏆</span>
+                    <div class="stat-info">
+                        <span class="stat-label">PONTOS</span>
+                        <strong id="score" class="stat-value">0</strong>
+                    </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-icon">⏱️</span>
+                    <div class="stat-info">
+                        <span class="stat-label">TEMPO</span>
+                        <strong id="timer" class="stat-value">30</strong>
+                    </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-icon">🎯</span>
+                    <div class="stat-info">
+                        <span class="stat-label">ACERTOS</span>
+                        <strong id="acertos" class="stat-value">0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Combo counter -->
+            <div class="combo-counter" id="combo-counter">
+                <span>🔥 COMBO</span>
+                <strong id="combo-value">0</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Pause -->
+    <div class="pause-modal" id="pauseModal">
+        <div class="pause-modal-content">
+            <div class="pause-modal-header">
+                <span class="pause-modal-icon">⏸️</span>
+                <h2>Jogo Pausado</h2>
+            </div>
+            <div class="pause-modal-stats">
+                <div class="pause-stat">
+                    <span>🏆 Pontuação Atual</span>
+                    <strong id="pauseScore">0</strong>
+                </div>
+                <div class="pause-stat">
+                    <span>✅ Acertos</span>
+                    <strong id="pauseAcertos">0</strong>
+                </div>
+                <div class="pause-stat">
+                    <span>⏱️ Tempo Restante</span>
+                    <strong id="pauseTimer">30</strong>
+                </div>
+            </div>
+            <div class="pause-modal-buttons">
+                <button class="btn-resume" onclick="resumeGame()">
+                    <span>▶️</span> Continuar
+                </button>
+                <button class="btn-restart" onclick="restartGame()">
+                    <span>🔄</span> Reiniciar
+                </button>
+            </div>
+            <div class="pause-instructions">
+                <p>Pressione <kbd>ESC</kbd> ou clique em "Continuar" para retomar</p>
+            </div>
+        </div>
+    </div>
+
+    <audio id="som-acerto" preload="auto">
+        <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="som-erro" preload="auto">
+        <source src="https://www.soundjay.com/misc/sounds/buzzer-or-wrong-answer-02.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script src="script.js"></script>
+</body>
+</html>
